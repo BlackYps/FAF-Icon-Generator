@@ -43,64 +43,7 @@ def show_preview(loadfolder):
     pdb.gimp_context_set_background((0.7, 0.7, 0.9, 1.0))
     image.flatten()
     pdb.gimp_context_set_background(color)
-        
     display = pdb.gimp_display_new(image)
-
-
-def resize_by_shape(image, icondistance, shape, symbol, tech, type):
-    # These have to be multiples of 4 or the engine mangles the icons
-    if shape in ("factory", "factoryhq"):
-        new_w = 24
-        new_h = 16
-    elif shape == "sub":
-        new_w = 20
-        new_h = 16
-    elif shape == "ship":
-        new_w = 20
-        new_h = 20
-    elif shape in ("bot", "gunship"):
-        new_w = 24
-        new_h = 16
-    elif shape == "land":
-        new_w = 24
-        new_h = 24
-    elif shape == "fighter":
-        new_w = 24
-        new_h = 28
-    elif shape in ("subcommander", "commander"):
-        new_w = 20
-        new_h = 20
-    elif shape == "bomber":
-        new_w = 28
-        new_h = 20
-    elif shape == "experimental":
-        new_w = 20
-        new_h = 20
-    elif shape == "structure":
-        new_w = 20
-        new_h = 20
-    else:
-        new_w = 20
-        new_h = 20
-    if symbol == "wall": # Walls have a smaller icon
-        new_w = 16
-        new_h = 16
-
-    offset_x = (new_w - icondistance) / 2
-    offset_y = (new_h - icondistance) / 2
-    if tech > 0:
-        new_h += 4
-        offset_y += 2
-    if shape == "bomber":
-        offset_y += 1
-    elif shape == "fighter":
-        offset_y += 4
-
-  #  if type == "rest" or type == "over":
-  #      new_w -= 2
-  #      new_h -= 2
-    
-    pdb.gimp_image_resize(image, new_w, new_h, offset_x, offset_y)
 
 
 def autoresize(image, layer, icondistance, tech):
@@ -127,7 +70,6 @@ def autoresize(image, layer, icondistance, tech):
 
 
 def plugin_main(loadfolder, imagefolder, preview):
-    
     shapes = ['bomber', 'bot', 'commander', 'experimental', 'factory', 'factoryhq', 'fighter', 'gunship', 'land', 'ship', 'structure', 'sub', 'subcommander']
     symbols = ['air', 'antiair', 'antiartillery', 'antimissile', 'antinavy', 'antishield', 'armored', 'artillery', 'bomb', 'counterintel', 'directfire', 'energy', 'energy_storage', 'engineer', 'generic', 'intel', 'land', 'mass', 'missile', 'naval', 'shield', 'sniper', 'transport', 'wall']
     types = ["over", "rest", "selected", "selectedover"]
@@ -167,11 +109,8 @@ def plugin_main(loadfolder, imagefolder, preview):
         except IndexError:
             errors += "Unexpected number of underscores: Cannot parse file " + icon + "\n"
         else:
-            #print(shape, tech, symbol, type)
-
             # Save a copy so we don't have to reset the translate and resize operations
             save_img = pdb.gimp_image_duplicate(image)
-            #display2 = pdb.gimp_display_new(save_img)
 
             # Move layers to get the desired icon
             distance = icondistance * -1
@@ -197,7 +136,6 @@ def plugin_main(loadfolder, imagefolder, preview):
                 if type == "over" or type == "selectedover":
                     pdb.gimp_drawable_invert(save_img.layers[0], 0)
                     
-                #resize_by_shape(save_img, icondistance, shape, symbol, tech, type)
                 layer = pdb.gimp_image_merge_visible_layers(save_img, CLIP_TO_IMAGE)
                 autoresize(save_img, layer, icondistance, tech)
                 layer = pdb.gimp_image_merge_visible_layers(save_img, CLIP_TO_IMAGE)
@@ -208,7 +146,6 @@ def plugin_main(loadfolder, imagefolder, preview):
                 # DXT1 Compression has high compression ratio and only one bit for alpha. This is exactly what we want
                 pdb.file_dds_save(save_img, layer, outputname, outputname, 1, 0, 0, 0, -1, 0, 0, 0, 0, 2.2, 0, 0, 0.5)
                 pdb.gimp_image_delete(save_img)
-                #pdb.gimp_display_delete(display2)
     if len(errors) > 0:
         pdb.gimp_message("The following errors occured:\n" + errors + str(skipped_files) + " additional files/folders were skipped")
     elif skipped_files > 0:
@@ -226,8 +163,8 @@ register(
     "2020",
     "<Toolbox>/File/Create/Icon Generation",
     "",
-    [(PF_STRING, "loadfolder", "location of the icons", "C:\Users\Jonas\Documents\Icon-Generator\icons\subset"),
-     (PF_STRING, "imagefolder", "location of the lookup images", "C:\Users\Jonas\Documents\Icon-Generator"),
+    [(PF_STRING, "loadfolder", "location of the icons", ""),
+     (PF_STRING, "imagefolder", "location of the lookup images", ""),
      (PF_BOOL, "preview", "show me a preview after generation", 1)],
     [],
     plugin_main)
