@@ -3,6 +3,7 @@
 from gimpfu import *
 import os
 
+
 def show_preview(loadfolder):
     image = pdb.gimp_image_new(80, 80, 0)
     iconlist = os.listdir(loadfolder)
@@ -34,7 +35,7 @@ def show_preview(loadfolder):
     image.resize(w, h, 5, 5)
     
     idx = 0
-    for layer in reversed(image.layers): # Layers are in reverse order
+    for layer in reversed(image.layers):  # Layers are in reverse order
         x_trans = idx % cols * icon_w
         y_trans = idx / cols * icon_h
         layer.translate(x_trans, y_trans)
@@ -60,9 +61,9 @@ def autoresize(image, layer, icondistance, tech):
     if new_h % 4 == 1 or new_h % 4 == 2:
         offset_y += 1
     if new_w % 4 > 0:
-        new_w +=  4 - (new_w % 4)
+        new_w += 4 - (new_w % 4)
     if new_h % 4 > 0:
-        new_h +=  4 - (new_h % 4)
+        new_h += 4 - (new_h % 4)
     if tech > 0:
         new_h += 4
         offset_y += 4
@@ -123,13 +124,13 @@ def plugin_main(loadfolder, imagefolder, preview):
             if type == "selected" or type == "selectedover":
                 offset += 1
             try:
-                pdb.gimp_layer_translate(save_img.layers[2], 0, tech * distance + offset) # Techlayer
-                if symbol == "wall": # Handle inconsistent naming of walls
-                    pdb.gimp_layer_translate(save_img.layers[1], types.index(type) * distance, 13 * distance) # Shapelayer
-                    pdb.gimp_layer_translate(save_img.layers[0], 0, symbols.index("generic") * distance) # Symbollayer
+                pdb.gimp_layer_translate(save_img.layers[2], 0, tech * distance + offset)  # Techlayer
+                if symbol == "wall":  # Handle inconsistent naming of walls
+                    pdb.gimp_layer_translate(save_img.layers[1], types.index(type) * distance, 13 * distance)  # Shapelayer
+                    pdb.gimp_layer_translate(save_img.layers[0], 0, symbols.index("generic") * distance)  # Symbollayer
                 else:
-                    pdb.gimp_layer_translate(save_img.layers[1], types.index(type) * distance, shapes.index(shape) * distance) # Shapelayer
-                    pdb.gimp_layer_translate(save_img.layers[0], 0, symbols.index(symbol) * distance) # Symbollayer
+                    pdb.gimp_layer_translate(save_img.layers[1], types.index(type) * distance, shapes.index(shape) * distance)  # Shapelayer
+                    pdb.gimp_layer_translate(save_img.layers[0], 0, symbols.index(symbol) * distance)  # Symbollayer
             except ValueError:
                 errors += "ValueError: Cannot parse file " + icon + "\n"
             else:
@@ -153,6 +154,7 @@ def plugin_main(loadfolder, imagefolder, preview):
     if preview:
         pdb.gimp_progress_set_text("generating preview file")
         show_preview(outputfolder)
+
 
 register(
     "python_fu_icon_generator",
