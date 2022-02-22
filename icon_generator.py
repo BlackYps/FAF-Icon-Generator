@@ -66,7 +66,7 @@ def autoresize(image, layer, icondistance, tech):
         new_h += 4 - (new_h % 4)
     if tech > 0:
         new_h += 4
-        offset_y += 4
+        offset_y += 3
     pdb.gimp_image_resize(image, new_w, new_h, offset_x, offset_y)
 
 
@@ -119,16 +119,16 @@ def plugin_main(loadfolder, imagefolder, preview):
 
             # Move layers to get the desired icon
             distance = icondistance * -1
-            if shape == "structure":
-                offset = 1
+            if shape == "structure" or shape == "sub":
+                techmarker_offset = 1
             elif shape == "land":
-                offset = 2
+                techmarker_offset = 1
             else:
-                offset = 0
+                techmarker_offset = 0
             if type == "selected" or type == "selectedover":
-                offset += 1
+                techmarker_offset += 1
             try:
-                pdb.gimp_layer_translate(save_img.layers[2], 0, tech * distance + offset)  # Techlayer
+                pdb.gimp_layer_translate(save_img.layers[2], 0, tech * distance + techmarker_offset)  # Techlayer
                 if symbol == "wall":  # Handle inconsistent naming of walls
                     pdb.gimp_layer_translate(save_img.layers[1], types.index(type) * distance, 13 * distance)  # Shapelayer
                     pdb.gimp_layer_translate(save_img.layers[0], 0, symbols.index("generic") * distance)  # Symbollayer
