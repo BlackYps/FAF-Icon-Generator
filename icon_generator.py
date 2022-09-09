@@ -47,7 +47,7 @@ def show_preview(loadfolder):
     display = pdb.gimp_display_new(image)
 
 
-def autoresize(image, layer, icondistance, tech):
+def autoresize(image, layer, icondistance, tech, shape, selected):
     # The dimensions have to be multiples of 4 or the engine mangles the icons
     pdb.gimp_image_select_item(image, 2, layer)
     pdb.gimp_image_select_rectangle(image, 3, 0, 0, icondistance, icondistance)
@@ -64,9 +64,18 @@ def autoresize(image, layer, icondistance, tech):
         new_w += 4 - (new_w % 4)
     if new_h % 4 > 0:
         new_h += 4 - (new_h % 4)
-    if tech > 0:
+
+    # This will likely need to be changed when the shape sizes change
+    if selected and tech > 1:
+        offset_y -= 1
+    elif not selected and tech < 2 and shape == "fighter":
+        offset_y += 1
+    elif not selected and tech > 1 and shape in ["land", "ship", "sub"]:
+        offset_y -= 1
+    # Center the images with tech markers
+    if tech > 1:
         new_h += 4
-        offset_y += 3
+        offset_y += 4
     pdb.gimp_image_resize(image, new_w, new_h, offset_x, offset_y)
 
 
@@ -122,11 +131,13 @@ def plugin_main(loadfolder, imagefolder, preview):
             if shape == "structure" or shape == "sub":
                 techmarker_offset = 1
             elif shape == "land":
-                techmarker_offset = 1
+                techmarker_offset = 2
             else:
                 techmarker_offset = 0
+            selected = False
             if type == "selected" or type == "selectedover":
                 techmarker_offset += 1
+                selected = True
             try:
                 pdb.gimp_layer_translate(save_img.layers[2], 0, tech * distance + techmarker_offset)  # Techlayer
                 if symbol == "wall":  # Handle inconsistent naming of walls
@@ -142,7 +153,7 @@ def plugin_main(loadfolder, imagefolder, preview):
                     pdb.gimp_drawable_invert(save_img.layers[0], 0)
 
                 layer = pdb.gimp_image_merge_visible_layers(save_img, CLIP_TO_IMAGE)
-                autoresize(save_img, layer, icondistance, tech)
+                autoresize(save_img, layer, icondistance, tech, shape, selected)
                 layer = pdb.gimp_image_merge_visible_layers(save_img, CLIP_TO_IMAGE)
                 outputfolder = os.path.join(loadfolder, "new")
                 if not os.path.exists(outputfolder):
