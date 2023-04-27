@@ -24,8 +24,8 @@ def show_preview(loadfolder):
     pdb.gimp_selection_none(image)
 
     num_layers = len(image.layers)
-    icon_w = 30
-    icon_h = 28
+    icon_w = 60
+    icon_h = 56
     cols = 8
     rows = num_layers / cols
     if num_layers % cols != 0:
@@ -67,11 +67,11 @@ def autoresize(image, layer, icondistance, tech, shape, selected):
 
     # This will likely need to be changed when the shape sizes change
     if selected and tech > 1:
-        offset_y -= 1
+        offset_y -= 2
     elif not selected and tech < 2 and shape == "fighter":
-        offset_y += 1
+        offset_y += 2
     elif not selected and tech > 1 and shape in ["land", "ship", "sub"]:
-        offset_y -= 1
+        offset_y -= 2
     # Center the images with tech markers
     if tech > 1:
         new_h += 4
@@ -96,7 +96,7 @@ def plugin_main(loadfolder, imagefolder, preview):
     iconlist.sort()
     errors = ""
     skipped_files = 0
-    icondistance = 40
+    icondistance = 80
     pdb.gimp_image_resize(image, icondistance, icondistance, 0, 0)
 
     for icon in iconlist:
