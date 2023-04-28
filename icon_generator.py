@@ -1,4 +1,4 @@
-#!/usr/bin/python
+
 
 from gimpfu import *
 import os
@@ -68,14 +68,10 @@ def autoresize(image, layer, icondistance, tech, shape, selected):
     # This will likely need to be changed when the shape sizes change
     if selected and tech > 1:
         offset_y -= 2
-    elif not selected and tech < 2 and shape == "fighter":
-        offset_y += 2
-    elif not selected and tech > 1 and shape in ["land", "ship", "sub"]:
-        offset_y -= 2
     # Center the images with tech markers
     if tech > 1:
-        new_h += 4
-        offset_y += 3
+        new_h += 8
+        offset_y += 7
     pdb.gimp_image_resize(image, new_w, new_h, offset_x, offset_y)
 
 
@@ -129,12 +125,22 @@ def plugin_main(loadfolder, imagefolder, preview):
             # Move layers to get the desired icon
             distance = icondistance * -1
             if shape == "structure" or shape == "sub":
-                techmarker_offset = 1
+                techmarker_offset = 2
             elif shape == "land":
-                techmarker_offset = 1
+                techmarker_offset = 2
             else:
                 techmarker_offset = 0
             selected = False
+            if shape == "air":
+                symbol_offset = -1
+            elif shape == "ship" and not symbol in ["intel", "counterintel"]:
+                symbol_offset = -1
+            elif shape == "land" and symbol in ["intel", "counterintel"]:
+                symbol_offset = 1
+            elif shape == "sub" and not symbol == "antinavy":
+                symbol_offset = 1
+            else:
+                symbol_offset = 0
             if type == "selected" or type == "selectedover":
                 techmarker_offset += 1
                 selected = True
@@ -145,7 +151,7 @@ def plugin_main(loadfolder, imagefolder, preview):
                     pdb.gimp_layer_translate(save_img.layers[0], 0, symbols.index("generic") * distance)  # Symbollayer
                 else:
                     pdb.gimp_layer_translate(save_img.layers[1], types.index(type) * distance, shapes.index(shape) * distance)  # Shapelayer
-                    pdb.gimp_layer_translate(save_img.layers[0], 0, symbols.index(symbol) * distance)  # Symbollayer
+                    pdb.gimp_layer_translate(save_img.layers[0], 0, symbols.index(symbol) * distance + symbol_offset)  # Symbollayer
             except ValueError:
                 errors += "ValueError: Cannot parse file " + icon + "\n"
             else:
@@ -179,12 +185,12 @@ register(
     "BlackYps",
     "BlackYps",
     "2020",
-    "<Toolbox>/File/Create/Icon Generation",
+    "Icon Generation",
     "",
     [(PF_STRING, "loadfolder", "location of the icons", ""),
      (PF_STRING, "imagefolder", "location of the lookup images", ""),
      (PF_BOOL, "preview", "show me a preview after generation", 1)],
     [],
-    plugin_main)
+    plugin_main, menu="<Image>/File/Create")
 
 main()
