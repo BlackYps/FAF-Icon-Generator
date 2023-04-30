@@ -66,8 +66,10 @@ def autoresize(image, layer, icondistance, tech, shape, selected):
         new_h += 4 - (new_h % 4)
 
     # This will likely need to be changed when the shape sizes change
+    if selected and shape == "fighter":
+        offset_y += 1
     if selected and tech > 1:
-        offset_y -= 2
+        offset_y -= 1
     # Center the images with tech markers
     if tech > 1:
         new_h += 8
@@ -142,7 +144,7 @@ def plugin_main(loadfolder, imagefolder, preview):
             else:
                 symbol_offset = 0
             if type == "selected" or type == "selectedover":
-                techmarker_offset += 1
+                techmarker_offset += 2
                 selected = True
             try:
                 pdb.gimp_layer_translate(save_img.layers[2], 0, tech * distance + techmarker_offset)  # Techlayer
