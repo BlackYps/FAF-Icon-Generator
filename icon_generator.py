@@ -66,9 +66,7 @@ def autoresize(image, layer, icondistance, tech, shape, selected):
         new_h += 4 - (new_h % 4)
 
     # This will likely need to be changed when the shape sizes change
-    if selected and tech > 1:
-        offset_y -= 1
-    elif not selected and tech > 1 and shape in ["fighter", "ship", "sub"]:
+    if not selected and tech > 1 and shape in ["fighter", "ship", "sub"]:
         offset_y += 1
     # Center the images with tech markers
     if tech > 1:
